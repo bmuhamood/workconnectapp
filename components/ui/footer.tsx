@@ -2,9 +2,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { 
-  Briefcase, Globe, MessageSquare, Heart, 
+  Globe, MessageSquare, Heart, 
   Sparkles, Mail, Facebook, Twitter, Instagram,
   Linkedin, Youtube, Apple, PlayCircle
 } from 'lucide-react';
@@ -67,8 +68,8 @@ export default function Footer({ variant = 'default' }: FooterProps) {
           {/* Brand Section */}
           <div className="md:col-span-2 lg:col-span-2">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <Briefcase className="h-6 w-6 text-white" />
+              <div className="h-12 w-12 rounded-xl overflow-hidden">
+                <Image src="/logo.png" alt="WorkConnect" width={48} height={48} className="h-12 w-12 object-cover" />
               </div>
               <div>
                 <span className="text-2xl font-bold">WorkConnect</span>

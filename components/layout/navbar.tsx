@@ -2,8 +2,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Sparkles, ArrowRight, User, LogOut, Menu, X, Home, Users, Info, Settings, Search } from 'lucide-react';
+import { Briefcase, ArrowRight, User, LogOut, Menu, X, Home, Users, Info, Settings, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -93,11 +94,8 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
-                <Briefcase className="h-5 w-5 text-white" />
-              </div>
-              <div className="absolute -top-1 -right-1 h-4 w-4 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-                <Sparkles className="h-1.5 w-1.5 text-white" />
+              <div className="h-10 w-10 rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow">
+                <Image src="/logo.png" alt="WorkConnect" width={40} height={40} className="h-10 w-10 object-cover" />
               </div>
             </div>
             <div className="flex flex-col">
