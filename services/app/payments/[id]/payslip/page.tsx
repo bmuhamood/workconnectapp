@@ -1,0 +1,120 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Loader2, Printer, ArrowLeft } from 'lucide-react';
+
+const formatUGX = (n: number) => 'UGX ' + new Intl.NumberFormat('en-UG').format(n || 0);
+
+export default function PayslipPage() {
+  const { id } = useParams<{ id: string }>();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const [payment, setPayment] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!authLoading && !user) router.push(`/login?redirect=/payments/${id}/payslip`);
+  }, [authLoading, user, router, id]);
+
+  useEffect(() => {
+    if (!id) return;
+    (async () => {
+      const { data, error } = await supabase
+        .from('worker_payments')
+        .select('*, worker_profiles(first_name, last_name, national_id, profession), contracts(job_title, employer_profiles(company_name, first_name, last_name))')
+        .eq('id', id)
+        .single();
+      if (!error) setPayment(data);
+      setLoading(false);
+    })();
+  }, [id]);
+
+  if (authLoading || loading) {
+    return <div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin text-emerald-600" /></div>;
+  }
+  if (!payment) return <div className="p-10 text-center text-gray-500">Payslip not found.</div>;
+
+  const employer = payment.contracts?.employer_profiles;
+  const worker = payment.worker_profiles;
+
+  return (
+    <div className="max-w-2xl mx-auto px-4 py-10">
+      {/* Hidden on print */}
+      <div className="flex items-center justify-between mb-6 print:hidden">
+        <Button variant="ghost" onClick={() => router.back()}><ArrowLeft className="h-4 w-4 mr-2" /> Back</Button>
+        <Button onClick={() => window.print()}><Printer className="h-4 w-4 mr-2" /> Print / Save as PDF</Button>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl p-8 print:border-0 print:shadow-none">
+        <div className="flex items-center justify-between mb-8 pb-6 border-b">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">WorkConnect</h1>
+            <p className="text-sm text-gray-500">Payslip</p>
+          </div>
+          <div className="text-right text-sm text-gray-500">
+            <div>Ref: {payment.payment_reference}</div>
+            <div>{new Date(payment.scheduled_date).toLocaleDateString('en-UG', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6 mb-8 text-sm">
+          <div>
+            <div className="text-gray-500 mb-1">Employee</div>
+            <div className="font-medium text-gray-900">{worker?.first_name} {worker?.last_name}</div>
+            <div className="text-gray-500">{worker?.profession}</div>
+            {worker?.national_id && <div className="text-gray-500">ID: {worker.national_id}</div>}
+          </div>
+          <div>
+            <div className="text-gray-500 mb-1">Employer</div>
+            <div className="font-medium text-gray-900">{employer?.company_name || `${employer?.first_name ?? ''} ${employer?.last_name ?? ''}`}</div>
+            <div className="text-gray-500">{payment.contracts?.job_title}</div>
+          </div>
+        </div>
+
+        <table className="w-full text-sm mb-8">
+          <thead>
+            <tr className="border-b text-left text-gray-500">
+              <th className="py-2">Description</th>
+              <th className="py-2 text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b">
+              <td className="py-2">Gross Salary</td>
+              <td className="py-2 text-right">{formatUGX(payment.salary_amount)}</td>
+            </tr>
+            {payment.deductions > 0 && (
+              <tr className="border-b">
+                <td className="py-2">Deductions</td>
+                <td className="py-2 text-right text-red-600">-{formatUGX(payment.deductions)}</td>
+              </tr>
+            )}
+            <tr>
+              <td className="py-3 font-semibold">Net Pay</td>
+              <td className="py-3 text-right font-semibold text-lg">{formatUGX(payment.net_amount)}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div className="grid grid-cols-2 gap-6 text-sm text-gray-500 mb-8">
+          <div>
+            <div className="mb-1">Payment Method</div>
+            <div className="text-gray-900 capitalize">{payment.payment_method?.replace(/_/g, ' ')}</div>
+          </div>
+          <div>
+            <div className="mb-1">Status</div>
+            <div className="text-gray-900 capitalize">{payment.status}</div>
+          </div>
+        </div>
+
+        <div className="pt-6 border-t text-xs text-gray-400 text-center">
+          Generated by WorkConnect · This is a system-generated payslip and does not require a signature.
+        </div>
+      </div>
+    </div>
+  );
+}
