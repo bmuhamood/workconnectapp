@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useContracts } from '@/hooks/useContracts';
@@ -20,7 +20,7 @@ interface Category {
   name: string;
 }
 
-export default function NewContractPage() {
+function NewContractPageContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -284,5 +284,13 @@ export default function NewContractPage() {
         </Button>
       </form>
     </div>
+  );
+}
+
+export default function NewContractPage() {
+  return (
+    <Suspense fallback={null}>
+      <NewContractPageContent />
+    </Suspense>
   );
 }

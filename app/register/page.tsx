@@ -1,7 +1,7 @@
 // app/register/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/layout/navbar';
 
-export default function RegisterTypePage() {
+function RegisterTypePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedType, setSelectedType] = useState<'worker' | 'employer' | null>(
@@ -319,5 +319,13 @@ export default function RegisterTypePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterTypePage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterTypePageContent />
+    </Suspense>
   );
 }

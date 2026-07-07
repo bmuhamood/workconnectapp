@@ -1,7 +1,7 @@
 // app/login/page.tsx - COMPLETE FIXED VERSION
 'use client';
 
-import { useState, FormEvent, useEffect } from 'react';
+import { Suspense, useState, FormEvent, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import ClientOnly from '@/components/ClientOnly';
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get('redirect') || searchParams.get('from') || '/dashboard';
@@ -343,5 +343,13 @@ export default function LoginPage() {
         </div>
       </div>
     </ClientOnly>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageContent />
+    </Suspense>
   );
 }
