@@ -17,7 +17,7 @@
   --color-accent: oklch(0.968 0.007 247.896);
   --color-accent-foreground: oklch(0.21 0.034 264.665);
   --color-destructive: oklch(0.577 0.245 27.325);
-  --color-destructive-foreground: oklch(0.577 0.245 27.325);
+  --color-destructive-foreground: oklch(0.985 0 0);
   --color-border: oklch(0.929 0.013 255.508);
   --color-input: oklch(0.929 0.013 255.508);
   --color-ring: oklch(0.576 0.245 262.881);
@@ -39,7 +39,7 @@
   --color-dark-accent: oklch(0.279 0.041 260.031);
   --color-dark-accent-foreground: oklch(0.985 0.002 247.858);
   --color-dark-destructive: oklch(0.704 0.191 22.216);
-  --color-dark-destructive-foreground: oklch(0.704 0.191 22.216);
+  --color-dark-destructive-foreground: oklch(0.985 0 0);
   --color-dark-border: oklch(0.279 0.041 260.031);
   --color-dark-input: oklch(0.279 0.041 260.031);
   --color-dark-ring: oklch(0.551 0.027 264.364);
@@ -128,5 +128,19 @@
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+/* Print rules — used by payslips, invoices, contracts, and any other
+   page with a "Print / Save as PDF" button. @page { margin: 0 } removes
+   the space most browsers reserve for their own auto-injected print
+   header/footer (which otherwise shows the raw page URL, date, and page
+   title) — the printed content supplies its own padding instead so it
+   doesn't look cramped against the physical page edge. */
+@media print {
+  @page {
+    margin: 0;
+  }
+  body {
+    padding: 0.5in;
   }
 }

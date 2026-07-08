@@ -1,7 +1,7 @@
 // components/ProfilePhotoUpload.tsx
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Camera, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -25,6 +25,13 @@ export default function ProfilePhotoUpload({
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl || null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // currentPhotoUrl often arrives after this component's initial mount
+  // (the parent profile page fetches it asynchronously), so useState's
+  // initial value alone isn't enough — sync whenever the prop changes.
+  useEffect(() => {
+    setPreviewUrl(currentPhotoUrl || null);
+  }, [currentPhotoUrl]);
 
   const resizeFile = (file: File): Promise<File> => {
     return new Promise((resolve) => {

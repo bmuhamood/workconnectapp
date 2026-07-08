@@ -22,11 +22,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`} suppressHydrationWarning>
         <ClientLayout>
-          <Header />
+          <div className="print:hidden">
+            <Header />
+          </div>
           <main className="min-h-screen pt-18"> {/* Add pt-16 (64px) for standard header height */}
             {children}
           </main>
-          <Footer />
+          <div className="print:hidden">
+            <Footer />
+          </div>
         </ClientLayout>
       </body>
     </html>

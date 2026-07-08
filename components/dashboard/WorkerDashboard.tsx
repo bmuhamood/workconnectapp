@@ -222,7 +222,7 @@ export default function WorkerDashboard() {
         <h3 className="text-2xl font-bold text-gray-900 mb-3">Welcome to WorkConnect!</h3>
         <p className="text-gray-600 max-w-md mx-auto mb-8">Get started by setting up your profile and uploading documents</p>
         <Button 
-          onClick={() => window.location.href = '/profile/edit'} 
+          onClick={() => window.location.href = '/profile'} 
           size="lg"
           className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
         >
@@ -394,7 +394,7 @@ export default function WorkerDashboard() {
             <CardFooter className="border-t bg-gray-50 pt-6 px-4 sm:px-6">
               <Button 
                 className="w-full py-6 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-md hover:shadow-lg transition-all"
-                onClick={() => window.location.href = '/profile/edit'}
+                onClick={() => window.location.href = '/profile'}
               >
                 Complete Profile Now
                 <ChevronRight className="ml-2 h-5 w-5" />
@@ -815,7 +815,7 @@ export default function WorkerDashboard() {
                 <Button 
                   variant="outline" 
                   className="h-auto py-3 sm:py-4 px-4 sm:px-6 justify-start border-gray-300 hover:bg-blue-50 hover:border-blue-200 transition-all"
-                  onClick={() => window.location.href = '/profile/edit'}
+                  onClick={() => window.location.href = '/profile'}
                 >
                   <div className="mr-3 sm:mr-4 p-2 bg-blue-100 rounded-lg">
                     <UserCheck className="h-5 sm:h-6 w-5 sm:w-6 text-blue-600" />

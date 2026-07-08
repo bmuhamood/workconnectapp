@@ -8,6 +8,7 @@ import { Briefcase, ArrowRight, User, LogOut, Menu, X, Home, Users, Info, Settin
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase/client';
 import { useRouter, usePathname } from 'next/navigation';
 import {
   DropdownMenu,
@@ -25,6 +26,29 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+
+  // The navbar's `user` (from useAuth) comes from the `profiles` table,
+  // which has no photo column — the photo lives in worker_profiles or
+  // employer_profiles instead, depending on role. Fetch it separately
+  // rather than restructuring the shared auth hook for one field.
+  useEffect(() => {
+    if (!user?.id || !user?.role) {
+      setPhotoUrl(null);
+      return;
+    }
+    const table = user.role === 'worker' ? 'worker_profiles' : user.role === 'employer' ? 'employer_profiles' : null;
+    if (!table) {
+      setPhotoUrl(null);
+      return;
+    }
+    supabase
+      .from(table)
+      .select('profile_photo_url')
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data }) => setPhotoUrl(data?.profile_photo_url || null));
+  }, [user?.id, user?.role]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,6 +91,13 @@ export default function Navbar() {
     }
     return 'U';
   };
+
+  const renderAvatar = (sizeClass: string) =>
+    photoUrl ? (
+      <img src={photoUrl} alt={getUserFullName()} className={`${sizeClass} rounded-full object-cover`} />
+    ) : (
+      <span>{getUserInitials()}</span>
+    );
 
   const navItems = [
     { href: '/', label: 'Home', icon: Home },
@@ -145,8 +176,8 @@ export default function Navbar() {
                       variant="ghost" 
                       className="relative h-12 w-12 rounded-full hover:bg-gray-100 transition-all p-0 group"
                     >
-                      <div className="h-11 w-11 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:shadow-xl transition-shadow border-2 border-white ring-2 ring-blue-100">
-                        {getUserInitials()}
+                      <div className="h-11 w-11 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:shadow-xl transition-shadow border-2 border-white ring-2 ring-blue-100 overflow-hidden">
+                        {renderAvatar("h-11 w-11")}
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
@@ -154,8 +185,8 @@ export default function Navbar() {
                     <DropdownMenuLabel className="p-4">
                       <div className="flex flex-col space-y-2">
                         <div className="flex items-center space-x-3">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-medium">
-                            {getUserInitials()}
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-medium overflow-hidden">
+                            {renderAvatar("h-10 w-10")}
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-gray-900 leading-tight">
@@ -271,8 +302,8 @@ export default function Navbar() {
                   <>
                     <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg mb-3">
                       <div className="flex items-center space-x-3">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-medium">
-                          {getUserInitials()}
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-medium overflow-hidden">
+                          {renderAvatar("h-10 w-10")}
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-gray-900">

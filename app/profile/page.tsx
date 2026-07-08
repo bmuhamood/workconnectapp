@@ -1,7 +1,7 @@
 // app/profile/page.tsx - COMPLETE UPDATED VERSION WITH PHOTO UPLOAD
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -125,10 +125,24 @@ function ProfilePageContent() {
     },
   });
 
+  const hasFetchedRef = useRef(false);
+
   useEffect(() => {
-    if (user) {
-      fetchProfile();
+    if (!user) return;
+    // This page is worker-specific (professional info, skills, documents).
+    // Employers and admins don't have a worker_profiles row at all, so
+    // fetchMyWorkerProfile() would always fail for them — send them to
+    // /settings instead, which already correctly handles every role.
+    if (user.role && user.role !== 'worker') {
+      router.replace('/settings');
+      return;
     }
+    // Guards against duplicate fetches (and duplicate stacked error toasts)
+    // if the user object's reference changes more than once during auth
+    // initialization — this effect should only actually fetch once.
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+    fetchProfile();
   }, [user]);
 
   const { fetchMyWorkerProfile } = useWorkers();
